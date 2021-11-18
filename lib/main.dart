@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter/material.dart';
 
-import 'Pages/Home Page.dart';
+import 'Pages/NewsPage.dart';
 
 
 
