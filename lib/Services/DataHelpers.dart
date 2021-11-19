@@ -12,9 +12,7 @@ class DataHelpers {
 
 
   Future<News> AllNews() async {
-    print("hihihihihi");
     String myUrl = "https://newsapi.org/v2/top-headlines?sources=techcrunch&apiKey=$ApiKey";
-    print("hih");
    var response = await dio.get(
       myUrl,
       /*options: Options(
@@ -23,12 +21,10 @@ class DataHelpers {
         },
       ),*/
     );
-    print("pppppp"+response.statusCode.toString());
     if (response.statusCode == 200) {
       /*print("lllllll"+json.decode(response.data).toString());*/
       return News.fromJson(response.data);
     } else {
-      print("mmmmm");
       // then throw an exception.
       throw Exception('Failed to load album');
     }
