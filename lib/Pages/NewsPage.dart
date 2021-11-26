@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:News_app_test/Models/News.dart';
 import 'package:News_app_test/Pages/NewsDetails.dart';
 import 'package:News_app_test/Services/DataHelpers.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
@@ -58,13 +62,14 @@ class _MyHomePageState extends State<MyHomePage> {
                       children: <Widget>[
                         Container(
                           height: 60,
-                          width: MediaQuery.of(context).size.width -30,
+                          width: MediaQuery.of(context).size.width - 30,
                           child: ListTile(
                             leading: new Icon(Icons.search),
                             title: new TextField(
                               controller: controller,
                               decoration: new InputDecoration(
-                                  hintText: 'Chercher', border: InputBorder.none),
+                                  hintText: 'Chercher',
+                                  border: InputBorder.none),
                               onChanged: (input) {
                                 setState(() {
                                   if (input.isEmpty) {
@@ -79,8 +84,9 @@ class _MyHomePageState extends State<MyHomePage> {
                               },
                             ),
                             trailing: new IconButton(
-                              color:
-                                  textSearch == null ? Colors.white : Colors.grey,
+                              color: textSearch == null
+                                  ? Colors.white
+                                  : Colors.grey,
                               icon: new Icon(Icons.cancel),
                               onPressed: () {
                                 setState(() {
@@ -98,38 +104,33 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
               ),
             ),
-                isLoading?
-    CircularProgressIndicator():
-            // _buildList(),
-            FutureBuilder<News>(
-                future: AllNews(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) {
-                    print(snapshot.error);
-                  }
-                  if (snapshot.hasData) {
-                    if (textSearch != "" && initList == false){
-                      print(snapshot.data.articles.length);
-                      print(textSearch);
-                     /* snapshot.data.articles.forEach((element) {
-                        print(element.toString());
-                        print(textSearch);
-                      });*/
-                    snapshot.data.articles.removeWhere((element) =>
-                        element
-                            .toString().toLowerCase()
-                            .contains(textSearch.toLowerCase()) ==
-                        false
-                    );
-                      print(snapshot.data.articles.length);
-                    }
-                    return ItemList(list: snapshot.data.articles);
-                  } else {
-                    return Container(
-                      child: Text('hiiiiiiiiiiii'),
-                    );
-                  }
-                }),
+            isLoading
+                ? Container()
+                :
+                // _buildList(),
+                FutureBuilder<News>(
+                    future: AllNews(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError) {
+                        print(snapshot.error);
+                      }
+                      if (snapshot.hasData) {
+                        if (textSearch != "" && initList == false) {
+                          print(snapshot.data.articles.length);
+                          print(textSearch);
+                          snapshot.data.articles.removeWhere((element) =>
+                              element
+                                  .toString()
+                                  .toLowerCase()
+                                  .contains(textSearch.toLowerCase()) ==
+                              false);
+                          print(snapshot.data.articles.length);
+                        }
+                        return ItemList(list: snapshot.data.articles);
+                      } else {
+                        return Container();
+                      }
+                    }),
           ],
         ));
   }
@@ -139,42 +140,43 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       isLoading = true;
     });
-     String ApiKey = "6fd07d4dab3a473b91c078235cebf1a2";
-    var dio = Dio();
-    String myUrl = "https://newsapi.org/v2/top-headlines?sources=techcrunch&apiKey=$ApiKey";
-    var response = await dio.get(
-      myUrl,
+    String ApiKey = "6fd07d4dab3a473b91c078235cebf1a2";
+    var options = BaseOptions(
+      connectTimeout: 20 * 1000,
+      receiveTimeout: 20 * 1000,
+      receiveDataWhenStatusError: true,
     );
+    var dio = Dio(options);
+    String myUrl =
+        "https://newsapi.org/v2/top-headlines?sources=techcrunch&apiKey=$ApiKey";
+    var response = await dio.get(myUrl);
+
     if (response.statusCode == 200) {
-      /*print("lllllll"+json.decode(response.data).toString());*/
-      news =  News.fromJson(response.data);
+      news = News.fromJson(response.data);
     } else {
       // then throw an exception.
-      throw Exception('Failed to load album');
+      throw Exception('Failed to load news');
     }
     setState(() {
       isLoading = false;
     });
     return news;
   }
-
 }
-
-
-
-
 
 class ItemList extends StatefulWidget {
   List list;
-  final List<String> searchNews;
-  ItemList({this.list, this.searchNews});
+  ItemList({this.list});
 
   @override
   _ItemListState createState() => _ItemListState();
 }
 
 class _ItemListState extends State<ItemList> {
+
   String type;
+  //final box = GetStorage();
+  List storageList = [];
   void _onValueChange(String value) {
     setState(() {
       _selectedId = value;
@@ -219,6 +221,27 @@ class _ItemListState extends State<ItemList> {
                 elevation: 2.0,
                 child: new Row(
                   children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                      child: FlatButton(
+                        child: Icon(
+                          Icons.favorite,
+                          color: Colors.green,
+                          size: 25,
+                        ),
+                        onPressed: () async {
+                          SharedPreferences prefs = await SharedPreferences.getInstance();
+                          final savedArticle = Article(source: widget.list[i].source, author: widget.list[i].author, title: widget.list[i].title,
+                              description: widget.list[i].description, url: widget.list[i].url, urlToImage: widget.list[i].urlToImage, publishedAt: widget.list[i].publishedAt, content: widget.list[i].content);
+                          String json = jsonEncode(savedArticle);
+                          print('saved... $json');
+                          setState(() {
+                            prefs.setString('News', json);
+                            print("shared..."+prefs.getString('News'));
+                          });
+                        },
+                      ),
+                    ),
                     Expanded(
                       flex: 1,
                       child: Padding(
@@ -250,6 +273,7 @@ class _ItemListState extends State<ItemList> {
           );
         });
   }
+
 }
 
 class GradientText extends StatelessWidget {
