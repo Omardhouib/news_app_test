@@ -1,12 +1,12 @@
 import 'dart:convert';
 
 import 'package:News_app_test/Models/News.dart';
+import 'package:News_app_test/Pages/FavNewsPage.dart';
 import 'package:News_app_test/Pages/NewsDetails.dart';
 import 'package:News_app_test/Services/DataHelpers.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
@@ -30,6 +30,14 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.white,
+          actions: [new IconButton(
+              icon: new Icon (Icons.favorite, color: Colors.red,size: 35), onPressed:(){
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => favNewsPage()));
+          }),
+          ],
           title: Container(
             alignment: Alignment.center,
             child: GradientText(
@@ -131,6 +139,8 @@ class _MyHomePageState extends State<MyHomePage> {
                         return Container();
                       }
                     }),
+
+
           ],
         ));
   }
@@ -173,10 +183,10 @@ class ItemList extends StatefulWidget {
 }
 
 class _ItemListState extends State<ItemList> {
-
   String type;
   //final box = GetStorage();
-  List storageList = [];
+
+  List<String> list = [];
   void _onValueChange(String value) {
     setState(() {
       _selectedId = value;
@@ -230,15 +240,26 @@ class _ItemListState extends State<ItemList> {
                           size: 25,
                         ),
                         onPressed: () async {
-                          SharedPreferences prefs = await SharedPreferences.getInstance();
-                          final savedArticle = Article(source: widget.list[i].source, author: widget.list[i].author, title: widget.list[i].title,
-                              description: widget.list[i].description, url: widget.list[i].url, urlToImage: widget.list[i].urlToImage, publishedAt: widget.list[i].publishedAt, content: widget.list[i].content);
+                          SharedPreferences prefs =
+                              await SharedPreferences.getInstance();
+
+                          Article savedArticle = Article(
+                              source: widget.list[i].source,
+                              author: widget.list[i].author,
+                              title: widget.list[i].title,
+                              description: widget.list[i].description,
+                              url: widget.list[i].url,
+                              urlToImage: widget.list[i].urlToImage,
+                              publishedAt: widget.list[i].publishedAt,
+                              content: widget.list[i].content);
+
                           String json = jsonEncode(savedArticle);
+
                           print('saved... $json');
-                          setState(() {
-                            prefs.setString('News', json);
-                            print("shared..."+prefs.getString('News'));
-                          });
+                          list.add(json);
+                          prefs.setStringList('News', list);
+                          print("number of articals : ..." +
+                              prefs.getStringList('News').length.toString());
                         },
                       ),
                     ),
@@ -273,7 +294,6 @@ class _ItemListState extends State<ItemList> {
           );
         });
   }
-
 }
 
 class GradientText extends StatelessWidget {

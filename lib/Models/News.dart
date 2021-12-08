@@ -66,6 +66,8 @@ class Article {
         content: json["content"],
       );
 
+  
+
   Map<String, dynamic> toJson() => {
         "source": source.toJson(),
         "author": author,
