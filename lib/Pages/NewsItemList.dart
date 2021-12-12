@@ -15,17 +15,7 @@ class ItemList extends StatefulWidget {
 
 class _ItemListState extends State<ItemList> {
   String type;
-  //final box = GetStorage();
-
   List<String> list = [];
-  void _onValueChange(String value) {
-    setState(() {
-      _selectedId = value;
-    });
-  }
-
-  String _selectedId;
-  ScrollController _controller = new ScrollController();
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
@@ -35,7 +25,12 @@ class _ItemListState extends State<ItemList> {
         shrinkWrap: true,
         itemBuilder: (context, i) {
           if (widget.list[i].source.id == null &&
-              widget.list[i].urlToImage == null) {
+              widget.list[i].urlToImage == null &&
+              widget.list[i].author == null &&
+              widget.list[i].title == null &&
+              widget.list[i].description == null &&
+              widget.list[i].url == null &&
+              widget.list[i].publishedAt == null) {
             return Container();
           }
           return GestureDetector(
@@ -124,8 +119,6 @@ class _ItemListState extends State<ItemList> {
                               gravity: ToastGravity.BOTTOM,
                               timeInSecForIosWeb: 15,
                               fontSize: 10.0);
-                          print("number of articals : ..." +
-                              prefs.getStringList('News').length.toString());
                         },
                       ),
                     ),

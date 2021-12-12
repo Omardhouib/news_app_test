@@ -92,7 +92,6 @@ class _MyHomePageState extends State<MyHomePage> {
                                   } else {
                                     textSearch = input;
                                     initList = false;
-                                    print(input);
                                   }
                                 });
                               },
@@ -128,15 +127,13 @@ class _MyHomePageState extends State<MyHomePage> {
                       }
                       if (snapshot.hasData) {
                         if (textSearch != "" && initList == false) {
-                          print(snapshot.data.articles.length);
-                          print(textSearch);
+
                           snapshot.data.articles.removeWhere((element) =>
                               element
                                   .toString()
                                   .toLowerCase()
                                   .contains(textSearch.toLowerCase()) ==
                               false);
-                          print(snapshot.data.articles.length);
                         }
                         return ItemList(list: snapshot.data.articles);
                       } else {
@@ -149,20 +146,15 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<News> AllNews() async {
     var news;
+    String key = "6fd07d4dab3a473b91c078235cebf1a2";
     setState(() {
       isLoading = true;
     });
-    String ApiKey = "6fd07d4dab3a473b91c078235cebf1a2";
-    var options = BaseOptions(
-      connectTimeout: 20 * 1000,
-      receiveTimeout: 20 * 1000,
-      receiveDataWhenStatusError: true,
-    );
-    var dio = Dio(options);
-    String myUrl =
-        "https://newsapi.org/v2/top-headlines?sources=techcrunch&apiKey=$ApiKey";
-    var response = await dio.get(myUrl);
 
+    var dio = Dio();
+    String myUrl =
+        "https://newsapi.org/v2/top-headlines?sources=techcrunch&apiKey=$key";
+    var response = await dio.get(myUrl);
     if (response.statusCode == 200) {
       news = News.fromJson(response.data);
     } else {

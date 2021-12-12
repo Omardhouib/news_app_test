@@ -57,7 +57,12 @@ class _favNewsPageState extends State<favNewsPage> {
               /* physics: NeverScrollableScrollPhysics(),*/
               shrinkWrap: true,
               itemBuilder: (context, i) {
-                return Container(
+                if (listArticle.length == 0){
+                  return Container(
+                  );
+                }
+                else {
+                  return Container(
                     margin:
                     EdgeInsets.symmetric(horizontal: 3.0, vertical: 3.0),
                     child: new Card(
@@ -96,6 +101,7 @@ class _favNewsPageState extends State<favNewsPage> {
                       ),
                     ),
                   );
+                }
               }),
         ],
       ),

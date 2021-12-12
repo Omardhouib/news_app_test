@@ -1,5 +1,3 @@
-import 'package:News_app_test/TextUi/GradientText.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share.dart';
 import 'package:url_launcher/url_launcher.dart';
